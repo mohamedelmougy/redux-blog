@@ -1,13 +1,11 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import {
-  selectPostById,
   useDeletePostMutation,
+  useGetPostsQuery,
   useUpdatePostMutation,
 } from "./postsSlice";
 import { useParams, useNavigate } from "react-router-dom";
-
-import { selectAllUsers } from "../users/usersSlice";
+import { useGetUsersQuery } from "../users/usersSlice";
 
 const EditPostForm = () => {
   const { postId } = useParams();
@@ -16,12 +14,33 @@ const EditPostForm = () => {
   const [updatePost, { isLoading }] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
 
-  const post = useSelector((state) => selectPostById(state, Number(postId)));
-  const users = useSelector(selectAllUsers);
+  const {
+    post,
+    isLoading: isLoadingPosts,
+    isSuccess,
+  } = useGetPostsQuery("getPosts", {
+    selectFromResult: ({ data, isLoading, isSuccess }) => ({
+      post: data?.entities[postId],
+      isLoading,
+      isSuccess,
+    }),
+  });
+
+  const { data: users, isSuccess: isSuccessUsers } =
+    useGetUsersQuery("getUsers");
 
   const [title, setTitle] = useState(post?.title);
   const [content, setContent] = useState(post?.body);
   const [userId, setUserId] = useState(post?.userId);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setTitle(post.title);
+      setContent(post.body);
+      setUserId(post.userId);
+    }
+  }, [isSuccess, post?.title, post?.body, post?.userId]);
+  if (isLoadingPosts) return <p>Loading...</p>
 
   if (!post) {
     return (
@@ -57,12 +76,14 @@ const EditPostForm = () => {
     }
   };
 
-  const usersOptions = users.map((user) => (
-    <option key={user.id} value={user.id}>
-      {user.name}
-    </option>
-  ));
-
+  let usersOptions;
+  if (isSuccessUsers) {
+    usersOptions = users.ids.map((id) => (
+      <option key={id} value={id}>
+        {users.entities[id].name}
+      </option>
+    ));
+  }
   const onDeletePostClicked = async () => {
     try {
       await deletePost({ id: post.id }).unwrap();
@@ -75,6 +96,8 @@ const EditPostForm = () => {
       console.error("Failed to delete the post", err);
     }
   };
+
+
 
   return (
     <section>

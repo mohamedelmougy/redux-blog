@@ -138,22 +138,3 @@ export const {
   useDeletePostMutation,
   useAddReactionMutation,
 } = extendedApiSlice;
-
-// return the query result object
-export const selectPostsResult = extendedApiSlice.endpoints.getPosts.select();
-
-// create memoized selector
-const selectPostsData = createSelector(
-  selectPostsResult,
-  (postsResult) => postsResult.data // normalized state object with ids & entities
-);
-
-//getSelectors creates these selectors and we rename them with aliases using destructuring
-export const {
-  selectAll: selectAllPosts,
-  selectById: selectPostById,
-  selectIds: selectPostIds,
-  // Pass in a selector that returns the posts slice of state
-} = postsAdapter.getSelectors(
-  (state) => selectPostsData(state) ?? initialState
-);

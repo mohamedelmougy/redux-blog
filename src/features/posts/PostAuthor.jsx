@@ -1,12 +1,14 @@
-import { useSelector } from "react-redux";
-import { selectAllUsers } from "../users/usersSlice";
 import { Link } from "react-router-dom";
+import { useGetUsersQuery } from "../users/usersSlice";
 
 // eslint-disable-next-line react/prop-types
 const PostAuthor = ({ userId }) => {
-  const users = useSelector(selectAllUsers);
+  const { user: author } = useGetUsersQuery("getUsers", {
+    selectFromResult: ({ data, isLoading }) => ({
+      user: data?.entities[userId],
+    }),
+  });
 
-  const author = users.find((user) => user.id === userId);
   return (
     <span>
       by{" "}

@@ -1,18 +1,23 @@
 import { useState } from "react";
-import {  useSelector } from "react-redux";
 import {  useAddNewPostMutation } from "./postsSlice";
-import { selectAllUsers } from "../users/usersSlice";
 import { useNavigate } from "react-router-dom";
+import { useGetUsersQuery } from "../users/usersSlice";
 
 const AddPostForm = () => {
-   const [addNewPost,{isLoading}]= useAddNewPostMutation()
-    const navigate = useNavigate()
+  const navigate = useNavigate()
+  const [addNewPost,{isLoading}]= useAddNewPostMutation()
+  const {
+    data: users,
+    isLoading:isLoadingUsers,
+    isSuccess,
+    isError,
+    error,
+  } = useGetUsersQuery();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState("");
 
-  const users=  useSelector(selectAllUsers)
 
   
   const onTitleChange = (e) => setTitle(e.target.value);
@@ -21,7 +26,7 @@ const AddPostForm = () => {
   
   const canSave = [title, content, userId].every(Boolean) && !isLoading;
 
-  const onSavePostClick =async () => {
+  const onSavePostClicked =async () => {
          if (canSave) {
             try {
               await addNewPost({title,body:content,userId}).unwrap()
@@ -36,13 +41,20 @@ const AddPostForm = () => {
         }
   };
 
+  let userOptions;
+  if (isLoadingUsers) {
+    userOptions = <p>Loading...</p>;
+  } else if (isSuccess) {
+    userOptions = users.ids.map(userId=>(
+      <option value={userId} key={userId}>
+        {users.entities[userId].name}
+      </option>
+    ))
+  } else if (isError) {
+    userOptions = <p>{error}</p>;
+  }
 
 
-  const userOptions = users.map(user=>(
-    <option value={user.id} key={user.id}>
-      {user.name}
-    </option>
-  ))
 
   return (
     <section>
@@ -70,7 +82,7 @@ const AddPostForm = () => {
         />
         <button  
             type="button" 
-            onClick={onSavePostClick}
+            onClick={onSavePostClicked}
             disabled={!canSave}
             >
           Save Post
