@@ -6,9 +6,9 @@ import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 import { fetchUsers } from "./features/users/usersSlice.js";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { fetchPosts } from "./features/posts/postsSlice.js";
+import { extendedApiSlice } from "./features/posts/postsSlice.js";
 
-store.dispatch(fetchPosts());
+store.dispatch(extendedApiSlice.endpoints.getPosts.initiate());
 store.dispatch(fetchUsers());
 
 ReactDOM.createRoot(document.getElementById("root")).render(
