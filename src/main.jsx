@@ -5,9 +5,6 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { extendedApiSlice } from "./features/posts/postsSlice.js";
-
-store.dispatch(extendedApiSlice.endpoints.getPosts.initiate());
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
