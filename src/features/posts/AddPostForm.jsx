@@ -1,32 +1,35 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewPost } from "./postsSlice";
-import { selectAllUsers } from "../users/usersSlice";
+import {  useAddNewPostMutation } from "./postsSlice";
 import { useNavigate } from "react-router-dom";
+import { useGetUsersQuery } from "../users/usersSlice";
 
 const AddPostForm = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate()
+  const navigate = useNavigate()
+  const [addNewPost,{isLoading}]= useAddNewPostMutation()
+  const {
+    data: users,
+    isLoading:isLoadingUsers,
+    isSuccess,
+    isError,
+    error,
+  } = useGetUsersQuery();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState("");
-  const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
-  const users=  useSelector(selectAllUsers)
 
   
   const onTitleChange = (e) => setTitle(e.target.value);
   const onContentChange = (e) => setContent(e.target.value);
   const onUserIdChange = (e) => setUserId(e.target.value);
   
-  const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle';
+  const canSave = [title, content, userId].every(Boolean) && !isLoading;
 
-  const onSavePostClick = () => {
+  const onSavePostClicked =async () => {
          if (canSave) {
             try {
-                setAddRequestStatus('pending')
-                dispatch(addNewPost({ title, body: content, userId })).unwrap()
+              await addNewPost({title,body:content,userId}).unwrap()
 
                 setTitle('')
                 setContent('')
@@ -34,19 +37,24 @@ const AddPostForm = () => {
                 navigate("/")
             } catch (err) {
                 console.error('Failed to save the post', err)
-            } finally {
-                setAddRequestStatus('idle')
-            }
+            } 
         }
   };
 
+  let userOptions;
+  if (isLoadingUsers) {
+    userOptions = <p>Loading...</p>;
+  } else if (isSuccess) {
+    userOptions = users.ids.map(userId=>(
+      <option value={userId} key={userId}>
+        {users.entities[userId].name}
+      </option>
+    ))
+  } else if (isError) {
+    userOptions = <p>{error}</p>;
+  }
 
 
-  const userOptions = users.map(user=>(
-    <option value={user.id} key={user.id}>
-      {user.name}
-    </option>
-  ))
 
   return (
     <section>
@@ -74,7 +82,7 @@ const AddPostForm = () => {
         />
         <button  
             type="button" 
-            onClick={onSavePostClick}
+            onClick={onSavePostClicked}
             disabled={!canSave}
             >
           Save Post

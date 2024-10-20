@@ -1,5 +1,5 @@
 import AddPostForm from "./features/posts/AddPostForm";
-import PostList from "./features/posts/PostList";
+import PostsList from "./features/posts/PostsList";
 import Layout from "./components/Layout";
 import { Routes, Route, Navigate } from "react-router-dom";
 import SinglePostPage from "./features/posts/SinglePostspage";
@@ -11,7 +11,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<PostList />} />
+        <Route index element={<PostsList />} />
 
         <Route path="post">
           <Route index element={<AddPostForm />} />
