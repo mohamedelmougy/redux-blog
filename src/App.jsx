@@ -5,18 +5,18 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-import AddPostForm from "./features/posts/AddPostForm";
-import PostsList from "./features/posts/PostsList";
-import Layout from "./components/Layout";
-import SinglePostPage from "./features/posts/SinglePostspage";
-import EditPostForm from "./features/posts/EditPostForm";
-import UsersList from "./features/users/UsersList";
-import UserPage from "./features/users/UserPage";
+import AddPostForm from "./pages/Post/AddPostFormPage";
+import PostsList from "./pages/Home/PostsList";
+import MainLayout from "./layouts/MainLayout";
+import SinglePostPage from "./pages/Post/SinglePostpage";
+import EditPostForm from "./pages/Post/EditPostFormPage";
+import UserPage from "./pages/User/UserPage";
+import UsersList from "./pages/User/UsersList";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
-      <Route path="/" element={<Layout />}>
+      <Route path="/" element={<MainLayout />}>
         <Route index element={<PostsList />} />
 
         <Route path="post">

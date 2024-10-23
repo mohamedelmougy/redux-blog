@@ -1,6 +1,7 @@
 import { formatDistanceToNow, parseISO } from "date-fns";
 
-const TimeAgo = ({timestamp}) => {
+const ViewTimeAgoHook = (timestamp) => {
+
   let timeAgo = ''
   if (timestamp) {
       const date = parseISO(timestamp)
@@ -8,11 +9,7 @@ const TimeAgo = ({timestamp}) => {
       timeAgo = `${timePeriod} ago`
   }
 
-  return (
-      <span title={timestamp}>
-          &nbsp; <i>{timeAgo}</i>
-      </span>
-  )
+  return [timeAgo]
 }
 
-export default TimeAgo
+export default ViewTimeAgoHook

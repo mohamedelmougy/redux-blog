@@ -1,13 +1,10 @@
 import { Link } from "react-router-dom";
-import { useGetUsersQuery } from "../users/usersSlice";
+import ViewPostAuthorHook from "../../hook/post/view-post-author-hook"
 
-// eslint-disable-next-line react/prop-types
 const PostAuthor = ({ userId }) => {
-  const { user: author } = useGetUsersQuery("getUsers", {
-    selectFromResult: ({ data, isLoading }) => ({
-      user: data?.entities[userId],
-    }),
-  });
+  
+  const [author]= ViewPostAuthorHook(userId)
+
 
   return (
     <span>

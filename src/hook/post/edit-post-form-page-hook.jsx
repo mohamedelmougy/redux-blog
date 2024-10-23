@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   useDeletePostMutation,
   useGetPostsQuery,
   useUpdatePostMutation,
-} from "./postsSlice";
-import { useParams, useNavigate } from "react-router-dom";
-import { useGetUsersQuery } from "../users/usersSlice";
+} from "../../features/posts/postsSlice";
+import { useGetUsersQuery } from "../../features/users/usersSlice";
 
-const EditPostForm = () => {
+const EditPostFormPageHook = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
 
@@ -40,15 +40,6 @@ const EditPostForm = () => {
       setUserId(post.userId);
     }
   }, [isSuccess, post?.title, post?.body, post?.userId]);
-  if (isLoadingPosts) return <p>Loading...</p>
-
-  if (!post) {
-    return (
-      <section>
-        <h2>Post not found!</h2>
-      </section>
-    );
-  }
 
   const onTitleChanged = (e) => setTitle(e.target.value);
   const onContentChanged = (e) => setContent(e.target.value);
@@ -76,14 +67,24 @@ const EditPostForm = () => {
     }
   };
 
+  
   let usersOptions;
-  if (isSuccessUsers) {
+  if (isLoadingPosts) {
+    usersOptions = <p>Loading...</p>;
+  } else if (isSuccessUsers) {
     usersOptions = users.ids.map((id) => (
       <option key={id} value={id}>
         {users.entities[id].name}
       </option>
     ));
+  } else if (!post) {
+    usersOptions = (
+      <section>
+        <h2>Post not found!</h2>
+      </section>
+    );
   }
+
   const onDeletePostClicked = async () => {
     try {
       await deletePost({ id: post.id }).unwrap();
@@ -97,45 +98,18 @@ const EditPostForm = () => {
     }
   };
 
-
-
-  return (
-    <section>
-      <h2>Edit Post</h2>
-      <form>
-        <label htmlFor="postTitle">Post Title:</label>
-        <input
-          type="text"
-          id="postTitle"
-          name="postTitle"
-          value={title}
-          onChange={onTitleChanged}
-        />
-        <label htmlFor="postAuthor">Author:</label>
-        <select id="postAuthor" value={userId} onChange={onAuthorChanged}>
-          <option value=""></option>
-          {usersOptions}
-        </select>
-        <label htmlFor="postContent">Content:</label>
-        <textarea
-          id="postContent"
-          name="postContent"
-          value={content}
-          onChange={onContentChanged}
-        />
-        <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
-          Save Post
-        </button>
-        <button
-          className="deleteButton"
-          type="button"
-          onClick={onDeletePostClicked}
-        >
-          Delete Post
-        </button>
-      </form>
-    </section>
-  );
+  return [
+    title,
+    onTitleChanged,
+    userId,
+    onAuthorChanged,
+    usersOptions,
+    onContentChanged,
+    onSavePostClicked,
+    canSave,
+    onDeletePostClicked,
+    content,
+  ];
 };
 
-export default EditPostForm;
+export default EditPostFormPageHook;
