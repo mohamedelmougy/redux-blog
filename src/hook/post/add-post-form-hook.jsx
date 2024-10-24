@@ -1,9 +1,8 @@
-import { useState } from "react";
 import { useAddNewPostMutation } from "../../features/posts/postsSlice";
 import { useGetUsersQuery } from "../../features/users/usersSlice";
 import { useNavigate } from "react-router-dom";
 
-const AddPostFormHook = () => {
+const AddPostFormHook = (reset, watch) => {
   const navigate = useNavigate();
   const [addNewPost, { isLoading }] = useAddNewPostMutation();
   const {
@@ -14,24 +13,21 @@ const AddPostFormHook = () => {
     error,
   } = useGetUsersQuery();
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [userId, setUserId] = useState("");
+  const { postTitle, postContent, postAuthor } = watch();
 
-  const onTitleChange = (e) => setTitle(e.target.value);
-  const onContentChange = (e) => setContent(e.target.value);
-  const onUserIdChange = (e) => setUserId(e.target.value);
+  const canSave =
+    [postTitle, postContent, postAuthor].every(Boolean) && !isLoading;
 
-  const canSave = [title, content, userId].every(Boolean) && !isLoading;
-
-  const onSavePostClicked = async () => {
-    if (canSave) {
+  const onSavePostClicked = async (data) => {
+    if (!isLoading) {
+      console.log(data);
       try {
-        await addNewPost({ title, body: content, userId }).unwrap();
-
-        setTitle("");
-        setContent("");
-        setUserId("");
+        await addNewPost({
+          title: data.postTitle,
+          body: data.postContent,
+          userId: data.postAuthor,
+        }).unwrap();
+        reset();
         navigate("/");
       } catch (err) {
         console.error("Failed to save the post", err);
@@ -52,17 +48,7 @@ const AddPostFormHook = () => {
     userOptions = <p>{error}</p>;
   }
 
-  return [
-    userOptions,
-    title,
-    onTitleChange,
-    userId,
-    onUserIdChange,
-    content,
-    onContentChange,
-    canSave,
-    onSavePostClicked,
-  ];
+  return [userOptions, canSave, onSavePostClicked];
 };
 
 export default AddPostFormHook;

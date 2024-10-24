@@ -1,43 +1,47 @@
+import { useForm } from "react-hook-form";
 import AddPostFormHook from "../../hook/post/add-post-form-hook";
 
 const AddPostForm = () => {
-  const [
-    userOptions,
-    title,
-    onTitleChange,
-    userId,
-    onUserIdChange,
-    content,
-    onContentChange,
-    canSave,
-    onSavePostClicked,
-  ] = AddPostFormHook();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+  } = useForm();
+
+  const [userOptions, canSave, onSavePostClicked] = AddPostFormHook(reset,watch);
 
   return (
     <section>
       <h2>Add New post</h2>
-      <form action="">
+      <form onSubmit={handleSubmit(onSavePostClicked)}>
         <label htmlFor="postTitle">Post Title:</label>
         <input
           type="text"
           id="postTitle"
-          name="postTitle"
-          value={title}
-          onChange={onTitleChange}
+          {...register("postTitle", { required: "Title is required" })}
         />
+        {errors.postTitle && <p>{errors.postTitle.message}</p>}
+
         <label htmlFor="postAuthor">Author:</label>
-        <select id="postAuthor" value={userId} onChange={onUserIdChange}>
+        <select
+          id="postAuthor"
+          {...register("postAuthor", { required: "Author is required" })}
+        >
           <option value=""></option>
           {userOptions}
         </select>
+        {errors.postAuthor && <p>{errors.postAuthor.message}</p>}
+
         <label htmlFor="postContent">Content:</label>
         <textarea
-          name="postContent"
           id="postContent"
-          value={content}
-          onChange={onContentChange}
+          {...register("postContent", { required: "Content is required" })}
         />
-        <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
+        {errors.postContent && <p>{errors.postContent.message}</p>}
+
+        <button type="submit" disabled={!canSave}>
           Save Post
         </button>
       </form>
