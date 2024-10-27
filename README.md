@@ -4,7 +4,7 @@ The React ecosystem is vast and constantly evolving, providing developers with a
 ## 1. Tech Stack
 
 - Framework: `React.js`
-- State Management: `Redux Toolkit`
+- State Management: `Redux Toolkit(RTK Query)`
 - Styling: `Pure CSS`
 - Form: `React Hook Form`
 - Router: `React Router DOM`
