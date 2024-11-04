@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import { useGetPostsQuery } from "../../features/posts/postsSlice"
 
-const ViewSinglePostsPage = () => {
+const ViewSinglePostsPageHook = () => {
  
     const {postId}= useParams()
 
@@ -22,7 +22,7 @@ const ViewSinglePostsPage = () => {
     }
 
 
-    return [post]
+    return post
 }
 
-export default ViewSinglePostsPage
+export default ViewSinglePostsPageHook

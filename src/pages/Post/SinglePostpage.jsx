@@ -2,10 +2,26 @@ import PostAuthor from "../../components/Post/PostAuthor";
 import TimeAgo from "../../components/Post/TimeAgo";
 import ReactionButtons from "../../components/Post/ReactionButtons";
 import { Link } from "react-router-dom";
-import ViewSinglePostsPage from "../../hook/post/view-single-posts-page-hook";
-
+import { useParams } from "react-router-dom";
+import { useGetPostsQuery } from "../../features/posts/postsSlice";
 const SinglePostPage = () => {
-  const [post] = ViewSinglePostsPage();
+  const { postId } = useParams();
+
+  const { post, isLoading } = useGetPostsQuery("getPosts", {
+    selectFromResult: ({ data, isLoading }) => ({
+      post: data?.entities[postId],
+      isLoading,
+    }),
+  });
+  if (isLoading) return <p>Loading...</p>;
+
+  if (!post) {
+    return (
+      <section>
+        <h2>Post not found!</h2>
+      </section>
+    );
+  }
 
   return (
     <article>
